@@ -5,6 +5,7 @@
   --primary: #0891b2;
   --accent: #16a34a;
   --warn: #f59e0b;
+  --danger: #e11d48;
   --border: #dbe3ef;
 }
 
@@ -18,7 +19,8 @@ body {
 }
 
 button,
-input {
+input,
+textarea {
   font: inherit;
 }
 
@@ -31,22 +33,29 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .app-shell {
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
   padding: 32px 0 48px;
 }
 
+/* ---------- 顶部 ---------- */
+
 .hero {
   display: grid;
-  grid-template-columns: 1fr minmax(260px, 360px);
+  grid-template-columns: 1fr minmax(280px, 380px);
   gap: 24px;
   align-items: stretch;
   margin-bottom: 20px;
 }
 
 .hero > div:first-child,
-.stack-card,
+.shift-card,
 .panel,
 .metric-card {
   background: #ffffff;
@@ -78,35 +87,56 @@ h1 {
   font-size: clamp(30px, 4vw, 48px);
   line-height: 1.05;
   margin-bottom: 14px;
-  letter-spacing: 0;
 }
 
 .subtitle {
   color: #526070;
-  font-size: 17px;
-  line-height: 1.7;
-  max-width: 720px;
+  font-size: 16px;
+  line-height: 1.8;
+  max-width: 760px;
   margin-bottom: 0;
 }
 
-.stack-card {
+.shift-card {
   padding: 24px;
   display: grid;
-  align-content: center;
-  gap: 10px;
+  align-content: start;
+  gap: 8px;
 }
 
-.stack-card span,
-.metric-card span,
-label span {
+.shift-card-label {
   color: #64748b;
   font-size: 13px;
 }
 
-.stack-card strong {
-  font-size: 18px;
-  line-height: 1.5;
+.shift-card strong {
+  font-size: 22px;
 }
+
+.shift-card-meta {
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.tab {
+  flex: 1;
+  font-weight: 600;
+}
+
+.tab.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+}
+
+/* ---------- 汇总卡片 ---------- */
 
 .metrics-grid {
   display: grid;
@@ -118,14 +148,30 @@ label span {
 .metric-card {
   position: relative;
   padding: 20px;
-  min-height: 118px;
+  min-height: 110px;
   overflow: hidden;
+}
+
+.metric-card span {
+  color: #64748b;
+  font-size: 13px;
 }
 
 .metric-card strong {
   display: block;
   margin-top: 12px;
   font-size: 34px;
+}
+
+.metric-card strong em {
+  font-style: normal;
+  font-size: 18px;
+  color: #64748b;
+}
+
+.metric-card strong.metric-text {
+  font-size: 26px;
+  line-height: 1.4;
 }
 
 .metric-card i {
@@ -146,43 +192,13 @@ label span {
 }
 
 .status-danger {
-  background: #e11d48;
+  background: var(--danger);
 }
 
-.workspace {
-  display: grid;
-  grid-template-columns: 290px 1fr;
-  gap: 20px;
-  margin-bottom: 20px;
-}
+/* ---------- 面板与通用 ---------- */
 
 .panel {
   padding: 22px;
-}
-
-.narrow h2 {
-  font-size: 17px;
-  margin-bottom: 12px;
-}
-
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 24px;
-}
-
-.chips span,
-.chips button {
-  min-height: 34px;
-  border-radius: 999px;
-  padding: 7px 12px;
-  border: 1px solid color-mix(in srgb, var(--primary) 28%, #dbe3ef);
-  background: color-mix(in srgb, var(--primary) 8%, #ffffff);
-}
-
-.chips.muted button {
-  background: #ffffff;
 }
 
 .section-heading {
@@ -201,12 +217,7 @@ label span {
   background: var(--primary);
   color: #ffffff;
   border-color: var(--primary);
-}
-
-.field-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+  font-weight: 600;
 }
 
 label {
@@ -214,60 +225,390 @@ label {
   gap: 8px;
 }
 
-input {
+label span {
+  color: #64748b;
+  font-size: 13px;
+}
+
+input,
+textarea {
   width: 100%;
   min-height: 42px;
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 0 12px;
   color: #172033;
+  background: #ffffff;
 }
 
-.record-list {
+textarea {
+  padding: 10px 12px;
+  min-height: 72px;
+  resize: vertical;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.badge.ok {
+  color: #15803d;
+  background: color-mix(in srgb, var(--accent) 14%, #ffffff);
+}
+
+.badge.pending {
+  color: #b45309;
+  background: color-mix(in srgb, var(--warn) 16%, #ffffff);
+}
+
+.badge.danger {
+  color: #be123c;
+  background: color-mix(in srgb, var(--danger) 12%, #ffffff);
+}
+
+/* ---------- 鱼缸卡片 ---------- */
+
+.tank-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.tank-card.tank-danger {
+  border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
+}
+
+.tank-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.tank-head h3 {
+  margin-bottom: 4px;
+  font-size: 18px;
+}
+
+.tank-species {
+  margin-bottom: 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.reading-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.danger-field input {
+  border-color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 6%, #ffffff);
+}
+
+.danger-field span {
+  color: #be123c;
+  font-weight: 700;
+}
+
+.tank-hint {
+  margin: 12px 0 0;
+  color: #b45309;
+  font-size: 13px;
+}
+
+/* ---------- 危险项处置 ---------- */
+
+.handling-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.handling-item {
+  border: 1px solid color-mix(in srgb, var(--danger) 35%, var(--border));
+  border-radius: 8px;
+  padding: 14px;
+  background: color-mix(in srgb, var(--danger) 4%, #ffffff);
   display: grid;
   gap: 12px;
 }
 
-.record-card {
-  display: grid;
-  grid-template-columns: 56px 1fr;
-  gap: 16px;
+.handling-item.resolved {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+  background: color-mix(in srgb, var(--accent) 5%, #ffffff);
+}
+
+.handling-head {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 16px;
-  background: #fbfdff;
+  gap: 12px;
 }
 
-.record-index {
+.handling-head strong {
+  color: #be123c;
+}
+
+.handling-item.resolved .handling-head strong {
+  color: #15803d;
+}
+
+.handling-form {
   display: grid;
-  place-items: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 8px;
-  color: #ffffff;
-  background: var(--primary);
-  font-weight: 800;
+  gap: 10px;
 }
 
-.record-card h3 {
+.handling-done p {
   margin-bottom: 6px;
-}
-
-.record-card p {
-  margin-bottom: 0;
-  color: #526070;
+  color: #334155;
+  font-size: 14px;
   line-height: 1.6;
 }
 
-@media (max-width: 860px) {
+.handling-done button {
+  min-height: 32px;
+  font-size: 13px;
+}
+
+.handling-logs {
+  margin: 0;
+  padding: 10px 0 0;
+  list-style: none;
+  border-top: 1px dashed var(--border);
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  color: #526070;
+}
+
+.handling-logs span {
+  color: #94a3b8;
+  font-variant-numeric: tabular-nums;
+}
+
+.handling-summary {
+  margin-bottom: 0;
+  font-size: 14px;
+  color: #334155;
+  line-height: 1.6;
+}
+
+/* ---------- 提交区 ---------- */
+
+.submit-panel {
+  border-left: 6px solid var(--primary);
+}
+
+.handover-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+.blocker-list {
+  margin-top: 18px;
+  border: 1px solid color-mix(in srgb, var(--warn) 45%, var(--border));
+  background: color-mix(in srgb, var(--warn) 8%, #ffffff);
+  border-radius: 8px;
+  padding: 14px 18px;
+}
+
+.blocker-list h3 {
+  margin-bottom: 10px;
+  font-size: 15px;
+  color: #b45309;
+}
+
+.blocker-list ul {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 6px;
+  color: #334155;
+  font-size: 14px;
+}
+
+/* ---------- 开班 ---------- */
+
+.start-panel {
+  max-width: 860px;
+}
+
+.start-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr) auto;
+  gap: 14px;
+  align-items: end;
+}
+
+.start-btn {
+  min-height: 42px;
+  white-space: nowrap;
+}
+
+.draft-list {
+  margin-top: 22px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.draft-list h3 {
+  margin-bottom: 4px;
+  font-size: 15px;
+}
+
+.draft-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  background: #fbfdff;
+}
+
+/* ---------- 交班记录 ---------- */
+
+.history-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.narrow h2 {
+  font-size: 17px;
+  margin-bottom: 12px;
+}
+
+.history-group {
+  margin-bottom: 16px;
+}
+
+.history-date {
+  margin-bottom: 8px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.history-item {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  padding: 10px 12px;
+  text-align: left;
+}
+
+.history-item.selected {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 8%, #ffffff);
+}
+
+.detail-meta {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin: 0 0 8px;
+}
+
+.detail-meta div {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #fbfdff;
+}
+
+.detail-meta dt {
+  color: #64748b;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.detail-meta dd {
+  margin: 0;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.detail-subhead {
+  margin: 22px 0 12px;
+  font-size: 16px;
+}
+
+.detail-table-wrap {
+  overflow-x: auto;
+}
+
+.detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.detail-table th,
+.detail-table td {
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.detail-table th {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.cell-danger {
+  color: #be123c;
+  font-weight: 700;
+  background: color-mix(in srgb, var(--danger) 6%, #ffffff);
+}
+
+.handover-note {
+  margin-bottom: 0;
+  color: #334155;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+/* ---------- 响应式 ---------- */
+
+@media (max-width: 960px) {
   .hero,
-  .workspace,
-  .metrics-grid {
+  .tank-grid,
+  .history-layout,
+  .handover-grid,
+  .start-grid {
     grid-template-columns: 1fr;
   }
 
-  .field-grid {
+  .metrics-grid,
+  .detail-meta {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .metrics-grid,
+  .reading-grid,
+  .detail-meta {
     grid-template-columns: 1fr;
   }
 }
